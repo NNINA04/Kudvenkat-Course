@@ -22,28 +22,13 @@ namespace Kudvenkat_Course
                 app.UseDeveloperExceptionPage();
             }
 
-            //DefaultFilesOptions defaultFilesOptions = CreateAndGetDefaultFilesOptions("default");
+            app.UseStaticFiles();
 
-            //app.UseDefaultFiles(defaultFilesOptions); // Установка 
-            //app.UseStaticFiles();
+            // app.UseMvcWithDefaultRoute(); == app.UseMvc(routes => routes.MapRoute("default", "{controller}/{action}/{id}"));
 
-            app.UseMvcWithDefaultRoute();
-
-            //app.Run(async (context) => // Вызывается в случае некорректного адресса в html
-            //{
-            //    await context.Response.WriteAsync("H W!");
-            //});
-        }
-
-        private DefaultFilesOptions CreateAndGetDefaultFilesOptions(params string[] names)
-        {
-            DefaultFilesOptions defaultFilesOptions = new();
-            defaultFilesOptions.DefaultFileNames.Clear(); // Очистка всех дефолтных имён (default & index)
-
-            foreach (string name in names)
-                defaultFilesOptions.DefaultFileNames.Add($"{name}.html"); // Добавление новых дефолтных имён
-
-            return defaultFilesOptions;
+            // controller=class, action=method, id=parameter.
+            // Присваивание дефолтных значений, будет означать дефолтной страницей
+            app.UseMvc(routes => routes.MapRoute("default", "{controller=Home}/{action=index}/{id?}"));
         }
     }
 }

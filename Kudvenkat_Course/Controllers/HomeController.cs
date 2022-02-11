@@ -1,4 +1,5 @@
 ﻿using Kudvenkat_Course.Models;
+using Kudvenkat_Course.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kudvenkat_Course.Controllers
@@ -12,16 +13,54 @@ namespace Kudvenkat_Course.Controllers
             _employeeRepository = employeeRepository;
         }
 
-        public string Index() // Default page
+        public ViewResult Index()
         {
-            return _employeeRepository.GetEmployee(1).Name;
+            var allEmployee = _employeeRepository.GetAllEmployee();
+
+            return View(allEmployee);
         }
 
-        public ViewResult Details()
+        public ViewResult Details(int? id)
         {
-            Employee employee = _employeeRepository.GetEmployee(1);
+            HomeDetailsViewModel homeDetailsViewModel = new()
+            {
+                Employee = _employeeRepository.GetEmployee(id ?? 1),
+                PageTitle = "Emplyee Details"
+            };
 
-            return View(employee);
+            // View takes directory(path) or tryies to find in directory {class name without Controller}/{method name}.cshtml
+            // also parameter that not means path will be in variable Model in Razor
+            // type of Model in Razor must be type of passed parameter
+            return View(homeDetailsViewModel);
+        }
+
+        [HttpGet]
+        public ViewResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Employee employee)
+        {
+            // IActionResult это базовый класс возвращаемых значений для методов контроллеров
+
+            if (ModelState.IsValid) 
+            {
+                Employee newEmployee = _employeeRepository.Add(employee);
+
+                //return RedirectToAction("details", new { id = newEmployee.Id });
+            }
+
+            return View();
+        }
+
+        [HttpDelete]
+        public RedirectToActionResult Delete(int id) 
+        {
+            _employeeRepository.Delete(id);
+
+            return RedirectToAction("index");
         }
     }
 }
