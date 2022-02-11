@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Employee>
+
+@{
+    ViewBag.Title = "Employee List";
+}
+
+<div class="card-group">
+    @foreach (var employee in Model)
+    {
+        <div class="card m-2">
+            <div class="card-header">
+                <h3>@employee.Name</h3>
+            </div>
+
+            @*
+            asp-append-version убирает кэширование, что позволит изменить картинку при перезагрузке,
+            если она действительно изменилась
+            *@
+            <img class="card-img-top" src="~/images/employees.png" asp-append-version="true"/>
+            <div class="card-footer text-center">
+                <a asp-controller="home" asp-action="details" asp-route-id="@employee.Id" class="btn btn-primary m-1">View</a>
+                <a href="#" class="btn btn-primary m-1">Edit</a>
+                <a href="#" class="btn btn-danger m-1">Delete</a>
+            </div>
+        </div>
+    }
+</div>
+
+@*
+asp-controller="home" asp-action="details" asp-route-id="@employee.Id"
+@Url.Action("details", "home", new { id = employee.Id })
+@Html.ActionLink("View", "details", "home", new { id = employee.Id })
+
+All these 3 examples generate: /home/details/{@employee.Id}
+*@
