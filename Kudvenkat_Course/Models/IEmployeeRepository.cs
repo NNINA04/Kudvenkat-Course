@@ -7,6 +7,7 @@ namespace Kudvenkat_Course.Models
         Employee GetEmployee(int Id);
         IEnumerable<Employee> GetAllEmployee();
         Employee Add(Employee employee);
-        void Delete(int id);
+        Employee Update(Employee employeeChanges);
+        void Delete(int Id);
     }
 }

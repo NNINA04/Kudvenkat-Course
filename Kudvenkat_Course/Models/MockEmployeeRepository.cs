@@ -22,7 +22,7 @@ namespace Kudvenkat_Course.Models
             employee.Id = _employeeList.Max(e => e.Id) + 1;
 
             _employeeList.Add(employee);
-            
+
             return employee;
         }
 
@@ -30,9 +30,26 @@ namespace Kudvenkat_Course.Models
 
         public Employee GetEmployee(int Id) => _employeeList.FirstOrDefault(x => x.Id == Id);
 
-        public void Delete(int id)
+        public Employee Update(Employee employeeChanges)
         {
-            _employeeList.RemoveAt(id);
+            int employeeIndex = _employeeList.FindIndex(e => e.Id == employeeChanges.Id);
+
+            if(employeeIndex != -1)
+            {
+                Employee employee = _employeeList[employeeIndex];
+                _employeeList[employeeIndex] = employeeChanges;
+                return employee;
+            }
+
+            return default;
+        }
+
+        public void Delete(int Id)
+        {
+            Employee employee = _employeeList.FirstOrDefault(e => e.Id == Id);
+
+            if(employee != null)
+                _employeeList.Remove(employee);
         }
     }
 }

@@ -20,18 +20,6 @@ namespace Kudvenkat_Course.Models
             return employee;
         }
 
-        public Employee Delete(int id)
-        {
-            Employee employee = _context.Employees.Find(id); // Поиск в самый DB?
-
-            if (employee != null)
-            {
-                _context.Employees.Remove(employee);
-                _context.SaveChanges();
-            }
-            return employee;
-        }
-
         public IEnumerable<Employee> GetAllEmployee()
         {
             return _context.Employees;
@@ -51,6 +39,17 @@ namespace Kudvenkat_Course.Models
             _context.SaveChanges();
 
             return employeeChanges;
+        }
+
+        public void Delete(int id)
+        {
+            Employee employee = _context.Employees.Find(id); // Поиск в самый DB?
+
+            if(employee != null)
+            {
+                _context.Employees.Remove(employee);
+                _context.SaveChanges();
+            }
         }
     }
 }

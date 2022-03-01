@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Kudvenkat_Course.Models;
+using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
-namespace Kudvenkat_Course.Models
+namespace Kudvenkat_Course.ViewModels
 {
-    public class Employee
+    public class EmployeeCreateViewModel
     {
         public int Id { get; set; }
 
@@ -18,6 +20,6 @@ namespace Kudvenkat_Course.Models
         [Required]
         public Dept? Department { get; set; }
 
-        public string PhotoPath { get; set; }
+        public IFormFile Photo { get; set; }
     }
 }

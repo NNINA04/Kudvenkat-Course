@@ -1,5 +1,9 @@
-﻿using Kudvenkat_Course.Models;
+﻿using System;
+using System.IO;
+using Kudvenkat_Course.Models;
 using Kudvenkat_Course.Models.ViewModels;
+using Kudvenkat_Course.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kudvenkat_Course.Controllers
@@ -7,10 +11,12 @@ namespace Kudvenkat_Course.Controllers
     public class HomeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public HomeController(IEmployeeRepository employeeRepository)
+        public HomeController(IEmployeeRepository employeeRepository, IWebHostEnvironment hostingEnvironment)
         {
             _employeeRepository = employeeRepository;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public ViewResult Index()
@@ -27,10 +33,6 @@ namespace Kudvenkat_Course.Controllers
                 Employee = _employeeRepository.GetEmployee(id ?? 1),
                 PageTitle = "Emplyee Details"
             };
-
-            // View takes directory(path) or tryies to find in directory {class name without Controller}/{method name}.cshtml
-            // also parameter that not means path will be in variable Model in Razor
-            // type of Model in Razor must be type of passed parameter
             return View(homeDetailsViewModel);
         }
 
@@ -41,22 +43,55 @@ namespace Kudvenkat_Course.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Employee employee)
+        public IActionResult Create(EmployeeCreateViewModel model)
         {
             // IActionResult это базовый класс возвращаемых значений для методов контроллеров
 
-            if (ModelState.IsValid) 
+            if(ModelState.IsValid)
             {
-                Employee newEmployee = _employeeRepository.Add(employee);
+                string uniqueFileName = null;
 
-                //return RedirectToAction("details", new { id = newEmployee.Id });
+                if(model.Photo != null)
+                {
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "images");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    model.Photo.CopyTo(new FileStream(filePath, FileMode.Create));
+                }
+
+                Employee newEmployee = new()
+                {
+                    Name = model.Name,
+                    Email = model.Email,
+                    Department = model.Department,
+                    PhotoPath = uniqueFileName
+                };
+
+                _employeeRepository.Add(newEmployee);
+
+                return RedirectToAction("details", new { id = newEmployee.Id });
             }
 
             return View();
         }
 
-        [HttpDelete]
-        public RedirectToActionResult Delete(int id) 
+        [HttpGet]
+        public ViewResult Edit(int id)
+        {
+            Employee employee = _employeeRepository.GetEmployee(id);
+            EmployeeEditViewModel employeeEditViewModel = new()
+            {
+                Id = employee.Id,
+                Name = employee.Name,
+                Email = employee.Email,
+                Department = employee.Department,
+                ExistingPhotoPath = employee.PhotoPath
+            };
+            return View(employeeEditViewModel);
+        }
+
+        [HttpDelete()]
+        public RedirectToActionResult Delete(int id)
         {
             _employeeRepository.Delete(id);
 

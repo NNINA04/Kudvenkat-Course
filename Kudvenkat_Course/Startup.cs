@@ -1,6 +1,8 @@
 using Kudvenkat_Course.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -8,16 +10,27 @@ namespace Kudvenkat_Course
 {
     public class Startup
     {
+        private readonly IConfiguration _config;
+
+        public Startup(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(setupAction => setupAction.EnableEndpointRouting = false);
+            // Add framework services.
+            string connectionString = _config.GetConnectionString("EmployeeDBConnection");
+            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
-            services.AddSingleton<IEmployeeRepository, MockEmployeeRepository>();
+
+            services.AddMvc(setupAction => setupAction.EnableEndpointRouting = false).AddXmlSerializerFormatters();
+            services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if(env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
